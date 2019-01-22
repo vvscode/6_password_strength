@@ -33,11 +33,12 @@ def has_been_pwned(password):
     # https://haveibeenpwned.com/API/v2#PwnedPasswords
     password_hash = hashlib.sha1(password.encode('utf-8')).hexdigest()
     response_marker_to_search = password_hash[5:].upper()
-    api_param = password_hash[0:5]
+    api_param = password_hash[:5]
     api_url = "https://api.pwnedpasswords.com/range/{}".format(api_param)
+    api_headers = {'User-Agent': 'Pwnage-Checker-For-Devman'}
     try:
         with urllib.request.urlopen(
-                urllib.request.Request(api_url, headers={'User-Agent': 'Pwnage-Checker-For-Devman'})) as f:
+                urllib.request.Request(api_url, headers=api_headers)) as f:
             response = str(f.read())
     except urllib.error.URLError:
         response = ''
