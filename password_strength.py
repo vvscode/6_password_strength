@@ -29,8 +29,15 @@ def contains_non_alphanumeric(password):
     return bool(re.search(r"[^a-zA-Z0-9]", password))
 
 
-def get_pwnedpasswords_range(range):
-    # https://haveibeenpwned.com/API/v2#PwnedPasswords
+def get_pawned_passwords_range(range):
+    """
+    https://haveibeenpwned.com/API/v2#PwnedPasswords
+    This database used because of:
+    - it gets updates quite often
+    - it contains much more information than static file
+
+    And it uses urllib to avoid using external package
+    """
     api_url = "https://api.pwnedpasswords.com/range/{}".format(range)
     api_headers = {'User-Agent': 'Pwnage-Checker-For-Devman'}
     try:
@@ -46,7 +53,7 @@ def has_been_pwned(password):
     response_marker_to_search = password_hash[5:].upper()
     range = password_hash[:5]
 
-    return get_pwnedpasswords_range(range).find(response_marker_to_search) > -1
+    return get_pawned_passwords_range(range).find(response_marker_to_search) > -1
 
 
 def is_diverse(password):
