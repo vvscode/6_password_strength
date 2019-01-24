@@ -1,7 +1,9 @@
 import getpass
+import os
 import re
 import urllib.request
 import hashlib
+import sys
 from collections import Counter
 
 
@@ -48,12 +50,22 @@ def get_pawned_passwords_range(range):
         return ''
 
 
-def has_been_pwned(password):
+def has_been_pwned_online(password):
     password_hash = hashlib.sha1(password.encode('utf-8')).hexdigest()
     response_marker_to_search = password_hash[5:].upper()
     range = password_hash[:5]
 
     return get_pawned_passwords_range(range).find(response_marker_to_search) > -1
+
+
+def load_file(file_name):
+    with open(file_name) as pointer:
+        return pointer.read()
+
+
+def has_been_pwned_in_file(password, file_name):
+    file_content = load_file(file_name)
+    return file_content.find(password) > -1
 
 
 def is_diverse(password):
@@ -74,7 +86,12 @@ def matched_by_banned_masks(password):
     return any(re.match(pattern, password) for pattern in filters)
 
 
-def get_password_strength(password):
+def get_password_strength(password, spawned_passwords_file=None):
+    if spawned_passwords_file:
+        is_pwned = has_been_pwned_in_file(password, spawned_passwords_file)
+    else:
+        is_pwned = has_been_pwned_online(password)
+
     return sum([
         1,
         has_normal_length(password),
@@ -83,13 +100,20 @@ def get_password_strength(password):
         contains_lowercase_letters(password),
         contains_uppercase_letters(password),
         contains_non_alphanumeric(password),
-        not has_been_pwned(password),
+        not is_pwned,
         is_diverse(password),
         not matched_by_banned_masks(password)
     ])
 
 
 if __name__ == '__main__':
+    passwords_filename = sys.argv[1] if len(sys.argv) > 1 else None
+
+    if not passwords_filename:
+        print("You haven't passed file name as a param, so we're going use online service to check your password")
+    elif not os.path.isfile(passwords_filename):
+        sys.exit("Please use correct file name")
+
     password = getpass.getpass()
-    strength = get_password_strength(password)
+    strength = get_password_strength(password, passwords_filename)
     print("Your password's score is {}".format(strength))

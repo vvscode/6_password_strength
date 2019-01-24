@@ -11,10 +11,22 @@
 - [ ] Не находится в базе скомпрометированных паролей
 - [ ] Содержит больше 6 разных символов
 
-Для запуска используйте команду
+Для запуска используйте команду.
+
+Проект может проверять ваш пароль используя локальную базу или базу онлайн.
+
+#### Для работы с локальной базой:
+
+- скачайте файл с базой паролей (например здесь https://github.com/danielmiessler/SecLists/tree/master/Passwords)
+- укажите файл первым аргументом при запуске скрипта
+```angular2
+python3 password_strength.py password_db.txt
+```
+
+При вызове без этого аргумента будет использована обновляемая онлайн база паролей
 
 `python3 password_strength.py`
 
-# Project Goals
+# Цели проекта
 
-The code is written for educational purposes. Training course for web-developers - [DEVMAN.org](https://devman.org)
+Код написан в учебных целях. Курс для веб-разработчиков - [DEVMAN.org](https://devman.org)
